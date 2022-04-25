@@ -14,7 +14,7 @@ class DeleteNoteUseCase @Inject constructor(private val notesRepository: NotesRe
             emit(Result.Loading<List<Note>>())
             notesRepository.delete(note)
             val list = notesRepository.getAll()
-            // kotlinx.coroutines.delay(3000)
+            // kotlinx.coroutines.delay(2000)
             emit(Result.Success<List<Note>>(data = list))
         } catch (e: Exception) {
             emit(Result.Error<List<Note>>(message = e.localizedMessage ?: "An error has occurred"))

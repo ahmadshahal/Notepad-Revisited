@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#1F1F1F</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_baseline_note_24</item>
+        <item name="postSplashScreenTheme">@style/Theme.Notepad</item>
+    </style>
+</resources>

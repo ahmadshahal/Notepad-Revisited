@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    var title: String = "",
-    var description: String = "",
+    val title: String = "",
+    val description: String = "",
+    val color: Int = 0,
 )

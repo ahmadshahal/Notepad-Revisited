@@ -13,7 +13,7 @@ class GetNoteUseCase @Inject constructor(private val notesRepository: NotesRepos
         try {
             emit(Result.Loading<Note>())
             val note = notesRepository.getById(id)
-            // kotlinx.coroutines.delay(5000)
+            // kotlinx.coroutines.delay(2000)
             emit(Result.Success<Note>(data = note))
         } catch (e: Exception) {
             emit(Result.Error<Note>(message = e.localizedMessage ?: "An error has occurred"))

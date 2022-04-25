@@ -13,7 +13,7 @@ class AddEditNoteUseCase @Inject constructor(private val notesRepository: NotesR
         try {
             emit(Result.Loading<Boolean>())
             notesRepository.insert(note)
-            // kotlinx.coroutines.delay(3000)
+            // kotlinx.coroutines.delay(2000)
             emit(Result.Success<Boolean>(data = true))
         } catch (e: Exception) {
             emit(Result.Error<Boolean>(message = e.localizedMessage ?: "An error has occurred"))

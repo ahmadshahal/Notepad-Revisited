@@ -4,9 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val DarkGray700 = Color(0xFF121212)
 val DarkGray500 = Color(0xFF1F1F1F)
-val RedOrange = Color(0xffffab91)
-val RedPink = Color(0xfff48fb1)
-val BabyBlue = Color(0xff81deea)
-val Violet = Color(0xffcf94da)
-val LightGreen = Color(0xffe7ed9b)
+val RedOrange = Color(0xFFFF9A90)
+val BabyBlue = Color(0xFFB3E5FC)
+val LightGreen = Color(0xFFC8E6CA)
 val White = Color.White

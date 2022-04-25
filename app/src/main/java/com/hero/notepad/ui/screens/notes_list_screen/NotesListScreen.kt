@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +13,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.ui.navigation.Screens
 import com.hero.notepad.ui.screens.notes_list_screen.components.NoteItem
 
@@ -30,15 +28,6 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
                     Text(text = "Notes", style = MaterialTheme.typography.h5)
                 },
                 elevation = 16.dp,
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
-                            contentDescription = "",
-                            tint = MaterialTheme.colors.onBackground
-                        )
-                    }
-                }
             )
         },
         floatingActionButton = {

@@ -19,8 +19,8 @@ class NotesListViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase
 ) : ViewModel() {
-    private val _state: MutableState<NotesListState> =
-        mutableStateOf(NotesListState(isLoading = true))
+
+    private val _state: MutableState<NotesListState> = mutableStateOf(NotesListState())
     val state: State<NotesListState> = _state
 
     init {

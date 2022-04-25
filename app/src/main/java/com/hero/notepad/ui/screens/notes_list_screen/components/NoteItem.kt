@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.hero.notepad.common.Constants
 import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.ui.theme.BabyBlue
 
@@ -24,7 +25,7 @@ fun NoteItem(note: Note, onDeleteClicked: () -> Unit, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(9.dp))
-            .background(BabyBlue)
+            .background(Constants.colors[note.color])
             .clickable { onClick() }
     ) {
         Column(
@@ -56,7 +57,7 @@ fun NoteItem(note: Note, onDeleteClicked: () -> Unit, onClick: () -> Unit) {
                 imageVector = Icons.Rounded.Delete,
                 tint = MaterialTheme.colors.onSurface,
                 contentDescription = "",
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(22.dp)
             )
         }
     }

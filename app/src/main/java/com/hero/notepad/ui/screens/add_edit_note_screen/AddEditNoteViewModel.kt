@@ -21,14 +21,18 @@ class AddEditNoteViewModel @Inject constructor(
     private val getNoteUseCase: GetNoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _addEditState = mutableStateOf<AddEditNoteState>(AddEditNoteState(isLoading = false))
+    private val _addEditState = mutableStateOf<AddEditNoteState>(AddEditNoteState())
     val addEditState: State<AddEditNoteState> = _addEditState
 
-    private val _getNoteState = mutableStateOf<GetNoteState>(GetNoteState(isLoading = false))
+    private val _getNoteState = mutableStateOf<GetNoteState>(GetNoteState())
     val getNoteState: State<GetNoteState> = _getNoteState
 
     val titleFieldState = mutableStateOf("")
     val descriptionFieldState = mutableStateOf("")
+
+    val dropDownMenuState = mutableStateOf(false)
+
+    var noteColor: Int = 0
 
     init {
         val noteId: Int = savedStateHandle.get<String>("noteId")?.toInt() ?: -1
@@ -45,6 +49,7 @@ class AddEditNoteViewModel @Inject constructor(
                         _getNoteState.value = GetNoteState(note = result.data ?: Note())
                         titleFieldState.value = _getNoteState.value.note!!.title
                         descriptionFieldState.value = _getNoteState.value.note!!.description
+                        noteColor = _getNoteState.value.note!!.color
                     }
                     is Result.Loading<Note> -> {
                         _getNoteState.value = GetNoteState(isLoading = true)
@@ -64,6 +69,7 @@ class AddEditNoteViewModel @Inject constructor(
                     id = _getNoteState.value.note?.id ?: 0,
                     title = titleFieldState.value,
                     description = descriptionFieldState.value,
+                    color = noteColor
                 ),
             ).collect { result ->
                 when (result) {
