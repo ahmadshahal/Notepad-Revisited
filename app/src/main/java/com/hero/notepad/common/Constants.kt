@@ -7,4 +7,5 @@ import com.hero.notepad.ui.theme.RedOrange
 
 object Constants {
     val colors: List<Color> = listOf(RedOrange, LightGreen, BabyBlue)
+    const val NOTE_ID_KEY = "noteId"
 }

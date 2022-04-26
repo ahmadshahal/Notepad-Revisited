@@ -5,11 +5,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hero.notepad.common.Result
+import com.hero.notepad.common.UiState
 import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.domain.usecases.DeleteNoteUseCase
 import com.hero.notepad.domain.usecases.GetNotesUseCase
-import com.hero.notepad.ui.screens.notes_list_screen.states.NotesListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,8 +19,9 @@ class NotesListViewModel @Inject constructor(
     private val deleteNoteUseCase: DeleteNoteUseCase
 ) : ViewModel() {
 
-    private val _state: MutableState<NotesListState> = mutableStateOf(NotesListState())
-    val state: State<NotesListState> = _state
+    private val _screenState: MutableState<UiState<List<Note>>> = mutableStateOf(UiState.Initial<List<Note>>())
+    val screenState: State<UiState<List<Note>>>
+        get() = _screenState
 
     init {
         getNotes()
@@ -29,36 +29,16 @@ class NotesListViewModel @Inject constructor(
 
     fun getNotes() {
         viewModelScope.launch {
-            getNotesUseCase.execute().collect { result ->
-                when (result) {
-                    is Result.Success<List<Note>> -> {
-                        _state.value = NotesListState(list = result.data ?: emptyList())
-                    }
-                    is Result.Loading -> {
-                        _state.value = NotesListState(isLoading = true)
-                    }
-                    is Result.Error -> {
-                        _state.value = NotesListState(error = result.message)
-                    }
-                }
+            getNotesUseCase.execute().collect { uiState ->
+                _screenState.value = uiState
             }
         }
     }
 
     fun deleteNote(note: Note) {
         viewModelScope.launch {
-            deleteNoteUseCase.execute(note).collect { result ->
-                when (result) {
-                    is Result.Success<List<Note>> -> {
-                        _state.value = NotesListState(list = result.data ?: emptyList())
-                    }
-                    is Result.Loading -> {
-                        _state.value = NotesListState(isLoading = true)
-                    }
-                    is Result.Error -> {
-                        _state.value = NotesListState(error = result.message)
-                    }
-                }
+            deleteNoteUseCase.execute(note).collect { uiState ->
+                _screenState.value = uiState
             }
         }
     }

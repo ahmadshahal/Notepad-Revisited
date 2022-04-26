@@ -7,7 +7,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ColorLens
-import androidx.compose.material.icons.rounded.Colorize
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.hero.notepad.common.Constants
+import com.hero.notepad.common.UiState
 import com.hero.notepad.ui.screens.add_edit_note_screen.components.HintTextField
 import com.hero.notepad.ui.screens.notes_list_screen.NotesListViewModel
 
@@ -42,8 +41,8 @@ fun AddEditNoteScreen(
             )
         }
     ) {
-        when {
-            addEditNoteViewModel.getNoteState.value.isLoading -> {
+        when(addEditNoteViewModel.loadNoteState.value) {
+            is UiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
@@ -51,11 +50,11 @@ fun AddEditNoteScreen(
                     )
                 }
             }
-            addEditNoteViewModel.getNoteState.value.error != null -> {
+            is UiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = addEditNoteViewModel.getNoteState.value.error!!,
+                        text = addEditNoteViewModel.loadNoteState.value.message!!,
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.onBackground
@@ -63,39 +62,44 @@ fun AddEditNoteScreen(
                 }
             }
             else -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(all = 16.dp),
-                ) {
-                    HintTextField(
-                        value = addEditNoteViewModel.titleFieldState.value, onChange = {
-                            addEditNoteViewModel.titleFieldState.value = it
-                        },
-                        textStyle = MaterialTheme.typography.h5.copy(
-                            color = MaterialTheme.colors.onBackground,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        hint = "Title",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(15.dp))
-                    HintTextField(
-                        value = addEditNoteViewModel.descriptionFieldState.value,
-                        onChange = {
-                            addEditNoteViewModel.descriptionFieldState.value = it
-                        },
-                        textStyle = MaterialTheme.typography.body1.copy(
-                            color = MaterialTheme.colors.onBackground
-                        ),
-                        hint = "Description",
-                        modifier = Modifier
-                            .weight(1F)
-                            .fillMaxSize(),
-                    )
-                }
+                Body(addEditNoteViewModel = addEditNoteViewModel)
             }
         }
+    }
+}
+
+@Composable
+fun Body(addEditNoteViewModel: AddEditNoteViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(all = 16.dp),
+    ) {
+        HintTextField(
+            value = addEditNoteViewModel.titleFieldState.value, onChange = {
+                addEditNoteViewModel.titleFieldState.value = it
+            },
+            textStyle = MaterialTheme.typography.h5.copy(
+                color = MaterialTheme.colors.onBackground,
+                fontWeight = FontWeight.SemiBold
+            ),
+            hint = "Title",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        HintTextField(
+            value = addEditNoteViewModel.descriptionFieldState.value,
+            onChange = {
+                addEditNoteViewModel.descriptionFieldState.value = it
+            },
+            textStyle = MaterialTheme.typography.body1.copy(
+                color = MaterialTheme.colors.onBackground
+            ),
+            hint = "Description",
+            modifier = Modifier
+                .weight(1F)
+                .fillMaxSize(),
+        )
     }
 }
 
@@ -123,33 +127,36 @@ fun AppBar(navController: NavController, addEditNoteViewModel: AddEditNoteViewMo
                     modifier = Modifier.size(22.dp)
                 )
             }
-            DropdownMenu(
-                expanded = addEditNoteViewModel.dropDownMenuState.value,
-                onDismissRequest = {
-                    addEditNoteViewModel.dropDownMenuState.value = false
-                },
-            ) {
-                ColorsDropDownMenuItem(
-                    colorIdx = 0,
-                    colorText = "Red",
-                    addEditNoteViewModel = addEditNoteViewModel
-                )
-                ColorsDropDownMenuItem(
-                    colorIdx = 1,
-                    colorText = "Green",
-                    addEditNoteViewModel = addEditNoteViewModel
-                )
-                ColorsDropDownMenuItem(
-                    colorIdx = 2,
-                    colorText = "Blue",
-                    addEditNoteViewModel = addEditNoteViewModel
-                )
-            }
+            MyDropDownMenu(addEditNoteViewModel)
         },
-        title = {
-
-        }
+        title = {}
     )
+}
+
+@Composable
+fun MyDropDownMenu(addEditNoteViewModel: AddEditNoteViewModel) {
+    DropdownMenu(
+        expanded = addEditNoteViewModel.dropDownMenuState.value,
+        onDismissRequest = {
+            addEditNoteViewModel.dropDownMenuState.value = false
+        },
+    ) {
+        ColorsDropDownMenuItem(
+            colorIdx = 0,
+            colorText = "Red",
+            addEditNoteViewModel = addEditNoteViewModel
+        )
+        ColorsDropDownMenuItem(
+            colorIdx = 1,
+            colorText = "Green",
+            addEditNoteViewModel = addEditNoteViewModel
+        )
+        ColorsDropDownMenuItem(
+            colorIdx = 2,
+            colorText = "Blue",
+            addEditNoteViewModel = addEditNoteViewModel
+        )
+    }
 }
 
 @Composable
@@ -160,10 +167,12 @@ fun FAB(
 ) {
     FloatingActionButton(
         onClick = {
-            if (!addEditNoteViewModel.addEditState.value.isLoading &&
-                (addEditNoteViewModel.titleFieldState.value.isNotEmpty() || addEditNoteViewModel.descriptionFieldState.value.isNotEmpty())
+            if (addEditNoteViewModel.saveNoteState.value !is UiState.Loading<Boolean>
+                && (addEditNoteViewModel.titleFieldState.value.isNotEmpty()
+                        || addEditNoteViewModel.descriptionFieldState.value.isNotEmpty())
             ) {
-                addEditNoteViewModel.saveNote() {
+                // TODO: Fix
+                addEditNoteViewModel.saveNote {
                     notesListViewModel.getNotes()
                     navController.popBackStack()
                 }
@@ -171,18 +180,21 @@ fun FAB(
         },
         backgroundColor = MaterialTheme.colors.onBackground,
     ) {
-        if (addEditNoteViewModel.addEditState.value.isLoading) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.size(20.dp),
-                strokeWidth = 3.dp
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Rounded.Save,
-                contentDescription = "",
-                tint = MaterialTheme.colors.primary
-            )
+        when (addEditNoteViewModel.saveNoteState.value) {
+            is UiState.Loading -> {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 3.dp
+                )
+            }
+            else -> {
+                Icon(
+                    imageVector = Icons.Rounded.Save,
+                    contentDescription = "",
+                    tint = MaterialTheme.colors.primary
+                )
+            }
         }
     }
 }

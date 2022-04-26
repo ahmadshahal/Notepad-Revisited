@@ -5,12 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hero.notepad.common.Result
+import com.hero.notepad.common.Constants
+import com.hero.notepad.common.UiState
 import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.domain.usecases.AddEditNoteUseCase
 import com.hero.notepad.domain.usecases.GetNoteUseCase
-import com.hero.notepad.ui.screens.add_edit_note_screen.states.AddEditNoteState
-import com.hero.notepad.ui.screens.add_edit_note_screen.states.GetNoteState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,11 +20,13 @@ class AddEditNoteViewModel @Inject constructor(
     private val getNoteUseCase: GetNoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _addEditState = mutableStateOf<AddEditNoteState>(AddEditNoteState())
-    val addEditState: State<AddEditNoteState> = _addEditState
+    private val _saveNoteState = mutableStateOf<UiState<Boolean>>(UiState.Initial())
+    val saveNoteState: State<UiState<Boolean>>
+        get() = _saveNoteState
 
-    private val _getNoteState = mutableStateOf<GetNoteState>(GetNoteState())
-    val getNoteState: State<GetNoteState> = _getNoteState
+    private val _loadNoteState = mutableStateOf<UiState<Note>>(UiState.Initial())
+    val loadNoteState: State<UiState<Note>>
+        get() = _loadNoteState
 
     val titleFieldState = mutableStateOf("")
     val descriptionFieldState = mutableStateOf("")
@@ -35,29 +36,21 @@ class AddEditNoteViewModel @Inject constructor(
     var noteColor: Int = 0
 
     init {
-        val noteId: Int = savedStateHandle.get<String>("noteId")?.toInt() ?: -1
-        if(noteId != -1) {
+        val noteId: Int = savedStateHandle.get<String>(Constants.NOTE_ID_KEY)?.toInt() ?: -1
+        if (noteId != -1) {
             loadNote(noteId)
         }
     }
 
     private fun loadNote(noteId: Int) {
         viewModelScope.launch {
-            getNoteUseCase.execute(noteId).collect { result ->
-                when (result) {
-                    is Result.Success<Note> -> {
-                        _getNoteState.value = GetNoteState(note = result.data ?: Note())
-                        titleFieldState.value = _getNoteState.value.note!!.title
-                        descriptionFieldState.value = _getNoteState.value.note!!.description
-                        noteColor = _getNoteState.value.note!!.color
-                    }
-                    is Result.Loading<Note> -> {
-                        _getNoteState.value = GetNoteState(isLoading = true)
-                    }
-                    is Result.Error<Note> -> {
-                        _getNoteState.value = GetNoteState(error = result.message)
-                    }
+            getNoteUseCase.execute(noteId).collect { uiState ->
+                if (uiState is UiState.Success) {
+                    titleFieldState.value = uiState.data!!.title
+                    descriptionFieldState.value = uiState.data.description
+                    noteColor = uiState.data.color
                 }
+                _loadNoteState.value = uiState
             }
         }
     }
@@ -66,23 +59,16 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             addEditNoteUseCase.execute(
                 Note(
-                    id = _getNoteState.value.note?.id ?: 0,
+                    id = _loadNoteState.value.data?.id ?: 0,
                     title = titleFieldState.value,
                     description = descriptionFieldState.value,
                     color = noteColor
                 ),
-            ).collect { result ->
-                when (result) {
-                    is Result.Success<Boolean> -> {
-                        onSuccess()
-                    }
-                    is Result.Loading<Boolean> -> {
-                        _addEditState.value = AddEditNoteState(isLoading = true)
-                    }
-                    is Result.Error<Boolean> -> {
-                        _addEditState.value = AddEditNoteState(error = result.message)
-                    }
+            ).collect { uiState ->
+                if (uiState is UiState.Success) {
+                    onSuccess()
                 }
+                _saveNoteState.value = uiState
             }
         }
     }
