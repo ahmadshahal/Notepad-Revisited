@@ -167,15 +167,9 @@ fun FAB(
 ) {
     FloatingActionButton(
         onClick = {
-            if (addEditNoteViewModel.saveNoteState.value !is UiState.Loading<Boolean>
-                && (addEditNoteViewModel.titleFieldState.value.isNotEmpty()
-                        || addEditNoteViewModel.descriptionFieldState.value.isNotEmpty())
-            ) {
-                // TODO: Fix
-                addEditNoteViewModel.saveNote {
-                    notesListViewModel.getNotes()
-                    navController.popBackStack()
-                }
+            addEditNoteViewModel.saveNote {
+                notesListViewModel.getNotes()
+                navController.popBackStack()
             }
         },
         backgroundColor = MaterialTheme.colors.onBackground,

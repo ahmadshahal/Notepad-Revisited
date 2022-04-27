@@ -57,20 +57,23 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun saveNote(onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            addEditNoteUseCase.execute(
-                Note(
-                    id = _loadNoteState.value.data?.id ?: 0,
-                    title = titleFieldState.value,
-                    description = descriptionFieldState.value,
-                    color = noteColor
-                ),
-            ).collect { uiState ->
-                if (uiState is UiState.Success) {
-                    onSuccess()
+        if(loadNoteState.value !is UiState.Loading && titleFieldState.value.isNotEmpty()) {
+            viewModelScope.launch {
+                addEditNoteUseCase.execute(
+                    Note(
+                        id = _loadNoteState.value.data?.id ?: 0,
+                        title = titleFieldState.value,
+                        description = descriptionFieldState.value,
+                        color = noteColor
+                    ),
+                ).collect { uiState ->
+                    if (uiState is UiState.Success) {
+                        onSuccess()
+                    }
+                    _saveNoteState.value = uiState
                 }
-                _saveNoteState.value = uiState
             }
         }
+
     }
 }
