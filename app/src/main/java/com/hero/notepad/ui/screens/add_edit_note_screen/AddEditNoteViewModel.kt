@@ -40,7 +40,7 @@ class AddEditNoteViewModel @Inject constructor(
 
     val dropDownMenuState = mutableStateOf(false)
 
-    var noteColor: Int = 0
+    var noteColorIdx = mutableStateOf(0)
 
     init {
         // Can't be null because it's an optional parameter with a default value.
@@ -56,7 +56,7 @@ class AddEditNoteViewModel @Inject constructor(
                 if (uiState is UiState.Success) {
                     titleFieldState.value = uiState.data!!.title
                     descriptionFieldState.value = uiState.data.description
-                    noteColor = uiState.data.color
+                    noteColorIdx.value = uiState.data.color
                 }
                 _loadNoteState.value = uiState
             }
@@ -64,14 +64,14 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun saveNote() {
-        if(loadNoteState.value !is UiState.Loading && titleFieldState.value.isNotEmpty()) {
+        if(loadNoteState.value is UiState.Success && titleFieldState.value.isNotEmpty()) {
             viewModelScope.launch {
                 addEditNoteUseCase.execute(
                     Note(
                         id = _loadNoteState.value.data?.id ?: 0,
                         title = titleFieldState.value,
                         description = descriptionFieldState.value,
-                        color = noteColor
+                        color = noteColorIdx.value
                     ),
                 ).collect { uiState ->
                     if (uiState is UiState.Success) {

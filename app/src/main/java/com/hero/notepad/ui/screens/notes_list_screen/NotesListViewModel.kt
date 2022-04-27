@@ -35,6 +35,10 @@ class NotesListViewModel @Inject constructor(
     private val _uiEvent: Channel<UiEvent> = Channel()
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
+    var sortIdx = mutableStateOf(0)
+
+    val dropDownMenuState = mutableStateOf(false)
+
     init {
         getNotes()
     }

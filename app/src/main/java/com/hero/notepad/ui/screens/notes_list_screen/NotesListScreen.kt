@@ -1,18 +1,19 @@
 package com.hero.notepad.ui.screens.notes_list_screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +41,7 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
                         viewModel.undoDeleteNote()
                     }
                 }
+                else -> Unit
             }
         }
     }
@@ -57,7 +59,7 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
         },
         backgroundColor = MaterialTheme.colors.background,
         topBar = {
-            MyAppBar()
+            MyAppBar(viewModel)
         },
         floatingActionButton = {
             FAB(navController = navController)
@@ -95,7 +97,12 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(uiState.data!!) { item ->
+                    val list = uiState.data!!.toMutableList()
+                    when(viewModel.sortIdx.value) {
+                        0 -> list.sortBy { note -> note.title}
+                        1 -> list.sortBy { note -> note.color}
+                    }
+                    items(list) { item ->
                         NoteItem(
                             item,
                             onClick = {
@@ -113,7 +120,7 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
 }
 
 @Composable
-fun MyAppBar() {
+fun MyAppBar(viewModel: NotesListViewModel) {
     TopAppBar(
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = MaterialTheme.colors.onBackground,
@@ -121,6 +128,16 @@ fun MyAppBar() {
             Text(text = "Notes", style = MaterialTheme.typography.h5)
         },
         elevation = 16.dp,
+        actions = {
+            IconButton(onClick = { viewModel.dropDownMenuState.value = true }) {
+                Icon(
+                    imageVector = Icons.Rounded.MoreVert,
+                    contentDescription = "",
+                    tint = MaterialTheme.colors.onBackground
+                )
+            }
+            SortDropDownMenu(viewModel = viewModel)
+        }
     )
 }
 
@@ -135,5 +152,69 @@ fun FAB(navController: NavController) {
             contentDescription = "",
             tint = MaterialTheme.colors.primary
         )
+    }
+}
+
+
+@Composable
+fun SortDropDownMenu(viewModel: NotesListViewModel) {
+    DropdownMenu(
+        expanded = viewModel.dropDownMenuState.value,
+        onDismissRequest = {
+            viewModel.dropDownMenuState.value = false
+        },
+    ) {
+        SortDropDownMenuItem(
+            sortIdx = 0,
+            sortText = "Sort alphabetically",
+            viewModel = viewModel
+        )
+        SortDropDownMenuItem(
+            sortIdx = 1,
+            sortText = "Sort by color",
+            viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+fun SortDropDownMenuItem(
+    sortIdx: Int,
+    sortText: String,
+    viewModel: NotesListViewModel
+) {
+    DropdownMenuItem(
+        onClick = {
+            viewModel.sortIdx.value = sortIdx
+            viewModel.dropDownMenuState.value = false
+        }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(MaterialTheme.colors.onBackground)
+            ) {
+                if (viewModel.sortIdx.value == sortIdx) {
+                    Box(
+                        modifier = Modifier
+                            .size(11.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(MaterialTheme.colors.primary)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = sortText,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onBackground
+            )
+        }
     }
 }

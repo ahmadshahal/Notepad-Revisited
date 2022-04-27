@@ -23,7 +23,6 @@ import com.hero.notepad.common.UiEvent
 import com.hero.notepad.common.UiState
 import com.hero.notepad.ui.screens.add_edit_note_screen.components.HintTextField
 import com.hero.notepad.ui.screens.notes_list_screen.NotesListViewModel
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun AddEditNoteScreen(
@@ -138,14 +137,14 @@ fun AppBar(navController: NavController, addEditNoteViewModel: AddEditNoteViewMo
                     modifier = Modifier.size(22.dp)
                 )
             }
-            MyDropDownMenu(addEditNoteViewModel)
+            ColorsDropDownMenu(addEditNoteViewModel)
         },
         title = {}
     )
 }
 
 @Composable
-fun MyDropDownMenu(addEditNoteViewModel: AddEditNoteViewModel) {
+fun ColorsDropDownMenu(addEditNoteViewModel: AddEditNoteViewModel) {
     DropdownMenu(
         expanded = addEditNoteViewModel.dropDownMenuState.value,
         onDismissRequest = {
@@ -207,7 +206,7 @@ fun ColorsDropDownMenuItem(
 ) {
     DropdownMenuItem(
         onClick = {
-            addEditNoteViewModel.noteColor = colorIdx
+            addEditNoteViewModel.noteColorIdx.value = colorIdx
             addEditNoteViewModel.dropDownMenuState.value = false
         }
     ) {
@@ -221,7 +220,7 @@ fun ColorsDropDownMenuItem(
                         .clip(RoundedCornerShape(15.dp))
                         .background(Constants.colors[colorIdx])
                 ) {
-                    if (addEditNoteViewModel.noteColor == colorIdx) {
+                    if (addEditNoteViewModel.noteColorIdx.value == colorIdx) {
                         Box(
                             modifier = Modifier
                                 .size(11.dp)
