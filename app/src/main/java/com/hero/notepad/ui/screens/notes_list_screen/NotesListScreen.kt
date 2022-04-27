@@ -21,7 +21,7 @@ import com.hero.notepad.common.Constants
 import com.hero.notepad.common.UiState
 import com.hero.notepad.ui.navigation.Screens
 import com.hero.notepad.ui.screens.notes_list_screen.components.NoteItem
-import com.hero.notepad.ui.screens.notes_list_screen.ui_events.UiEvent
+import com.hero.notepad.common.UiEvent
 
 @Composable
 fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel = hiltViewModel()) {

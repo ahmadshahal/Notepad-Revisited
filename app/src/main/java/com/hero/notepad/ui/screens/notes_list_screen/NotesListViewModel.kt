@@ -10,7 +10,7 @@ import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.domain.usecases.AddEditNoteUseCase
 import com.hero.notepad.domain.usecases.DeleteNoteUseCase
 import com.hero.notepad.domain.usecases.GetNotesUseCase
-import com.hero.notepad.ui.screens.notes_list_screen.ui_events.UiEvent
+import com.hero.notepad.common.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

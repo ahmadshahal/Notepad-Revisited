@@ -41,7 +41,7 @@ fun AddEditNoteScreen(
             )
         }
     ) {
-        when(val uiState = addEditNoteViewModel.loadNoteState.value) {
+        when (val uiState = addEditNoteViewModel.loadNoteState.value) {
             is UiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -210,12 +210,22 @@ fun ColorsDropDownMenuItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Constants.colors[colorIdx])
-            )
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Constants.colors[colorIdx])
+                ) {
+                    if (addEditNoteViewModel.noteColor == colorIdx) {
+                        Box(
+                            modifier = Modifier
+                                .size(11.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(MaterialTheme.colors.primary)
+                                .align(Alignment.Center)
+                        )
+                    }
+            }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = colorText,
