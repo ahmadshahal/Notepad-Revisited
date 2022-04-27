@@ -9,6 +9,7 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,9 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.hero.notepad.common.Constants
+import com.hero.notepad.common.UiEvent
 import com.hero.notepad.common.UiState
 import com.hero.notepad.ui.screens.add_edit_note_screen.components.HintTextField
 import com.hero.notepad.ui.screens.notes_list_screen.NotesListViewModel
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun AddEditNoteScreen(
@@ -28,17 +31,24 @@ fun AddEditNoteScreen(
     addEditNoteViewModel: AddEditNoteViewModel = hiltViewModel(),
     notesListViewModel: NotesListViewModel
 ) {
+    LaunchedEffect(key1 = true) {
+        addEditNoteViewModel.uiEvent.collect { uiEvent ->
+            when(uiEvent) {
+                is UiEvent.PopBackStack -> {
+                    navController.popBackStack()
+                    notesListViewModel.getNotes()
+                }
+                else -> Unit
+            }
+        }
+    }
     Scaffold(
         backgroundColor = MaterialTheme.colors.background,
         topBar = {
             AppBar(navController = navController, addEditNoteViewModel = addEditNoteViewModel)
         },
         floatingActionButton = {
-            FAB(
-                addEditNoteViewModel = addEditNoteViewModel,
-                notesListViewModel = notesListViewModel,
-                navController = navController
-            )
+            FAB(addEditNoteViewModel = addEditNoteViewModel)
         }
     ) {
         when (val uiState = addEditNoteViewModel.loadNoteState.value) {
@@ -163,15 +173,10 @@ fun MyDropDownMenu(addEditNoteViewModel: AddEditNoteViewModel) {
 @Composable
 fun FAB(
     addEditNoteViewModel: AddEditNoteViewModel,
-    notesListViewModel: NotesListViewModel,
-    navController: NavController
 ) {
     FloatingActionButton(
         onClick = {
-            addEditNoteViewModel.saveNote {
-                notesListViewModel.getNotes()
-                navController.popBackStack()
-            }
+            addEditNoteViewModel.saveNote()
         },
         backgroundColor = MaterialTheme.colors.onBackground,
     ) {

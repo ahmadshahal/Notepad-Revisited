@@ -6,11 +6,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hero.notepad.common.Constants
+import com.hero.notepad.common.UiEvent
 import com.hero.notepad.common.UiState
 import com.hero.notepad.data.local.app_database.entities.Note
 import com.hero.notepad.domain.usecases.AddEditNoteUseCase
 import com.hero.notepad.domain.usecases.GetNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +31,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val _loadNoteState = mutableStateOf<UiState<Note>>(UiState.Initial())
     val loadNoteState: State<UiState<Note>>
         get() = _loadNoteState
+
+    private val _uiEvent: Channel<UiEvent> = Channel()
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     val titleFieldState = mutableStateOf("")
     val descriptionFieldState = mutableStateOf("")
@@ -56,7 +63,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    fun saveNote(onSuccess: () -> Unit) {
+    fun saveNote() {
         if(loadNoteState.value !is UiState.Loading && titleFieldState.value.isNotEmpty()) {
             viewModelScope.launch {
                 addEditNoteUseCase.execute(
@@ -68,7 +75,7 @@ class AddEditNoteViewModel @Inject constructor(
                     ),
                 ).collect { uiState ->
                     if (uiState is UiState.Success) {
-                        onSuccess()
+                        _uiEvent.send(UiEvent.PopBackStack)
                     }
                     _saveNoteState.value = uiState
                 }
