@@ -36,7 +36,8 @@ class AddEditNoteViewModel @Inject constructor(
     var noteColor: Int = 0
 
     init {
-        val noteId: Int = savedStateHandle.get<String>(Constants.NOTE_ID_KEY)?.toInt() ?: -1
+        // Can't be null because it's an optional parameter with a default value.
+        val noteId: Int = savedStateHandle.get<Int>(Constants.NOTE_ID_KEY)!!
         if (noteId != -1) {
             loadNote(noteId)
         }
