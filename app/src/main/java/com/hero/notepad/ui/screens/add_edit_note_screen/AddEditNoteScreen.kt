@@ -41,7 +41,7 @@ fun AddEditNoteScreen(
             )
         }
     ) {
-        when(addEditNoteViewModel.loadNoteState.value) {
+        when(val uiState = addEditNoteViewModel.loadNoteState.value) {
             is UiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -54,7 +54,7 @@ fun AddEditNoteScreen(
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = addEditNoteViewModel.loadNoteState.value.message!!,
+                        text = uiState.message!!,
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.onBackground
@@ -76,7 +76,8 @@ fun Body(addEditNoteViewModel: AddEditNoteViewModel) {
             .padding(all = 16.dp),
     ) {
         HintTextField(
-            value = addEditNoteViewModel.titleFieldState.value, onChange = {
+            value = addEditNoteViewModel.titleFieldState.value,
+            onChange = {
                 addEditNoteViewModel.titleFieldState.value = it
             },
             textStyle = MaterialTheme.typography.h5.copy(
