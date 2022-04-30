@@ -64,7 +64,10 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun saveNote() {
-        if(loadNoteState.value is UiState.Success && titleFieldState.value.isNotEmpty()) {
+        if ((loadNoteState.value is UiState.Success
+                    || loadNoteState.value is UiState.Initial)
+            && titleFieldState.value.isNotEmpty()
+        ) {
             viewModelScope.launch {
                 addEditNoteUseCase.execute(
                     Note(
