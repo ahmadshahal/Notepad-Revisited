@@ -1,14 +1,16 @@
 package com.hero.notepad.ui.screens.notes_list_screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import com.hero.notepad.common.UiState
 import com.hero.notepad.ui.navigation.Screens
 import com.hero.notepad.ui.screens.notes_list_screen.components.NoteItem
 import com.hero.notepad.common.UiEvent
+import com.hero.notepad.data.local.app_database.entities.Note
 
 @Composable
 fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel = hiltViewModel()) {
@@ -87,34 +90,79 @@ fun NotesListScreen(navController: NavController, viewModel: NotesListViewModel 
                 }
             }
             is UiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        top = 12.dp,
-                        bottom = 84.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    val list = uiState.data!!.toMutableList()
-                    when(viewModel.sortIdx.value) {
-                        0 -> list.sortBy { note -> note.title}
-                        1 -> list.sortBy { note -> note.color}
-                    }
-                    items(list) { item ->
-                        NoteItem(
-                            item,
-                            onClick = {
-                                navController.navigate(Screens.AddEditNoteScreen + "?${Constants.NOTE_ID_KEY}=${item.id}")
-                            },
-                            onDeleteClicked = {
-                                viewModel.deleteNote(item)
-                            }
-                        )
-                    }
+                if (viewModel.listNotesAsGrid.value) {
+                    GridView(viewModel = viewModel, notesList = uiState.data!!, navController = navController)
+                } else {
+                    ListView(viewModel = viewModel, notesList = uiState.data!!, navController = navController)
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun GridView(viewModel: NotesListViewModel, notesList: List<Note>, navController: NavController) {
+    LazyVerticalGrid(
+        cells = GridCells.Fixed(2),
+        modifier = Modifier,
+        contentPadding = PaddingValues(
+            top = 6.dp,
+            bottom = 78.dp,
+            start = 10.dp,
+            end = 10.dp
+        ),
+    ) {
+        val list = notesList.toMutableList()
+        when (viewModel.sortIdx.value) {
+            0 -> list.sortBy { note -> note.title }
+            1 -> list.sortBy { note -> note.color }
+        }
+        items(list) { item ->
+            Box(modifier = Modifier.padding(6.dp)) {
+                NoteItem(
+                    item,
+                    onClick = {
+                        navController.navigate(Screens.AddEditNoteScreen + "?${Constants.NOTE_ID_KEY}=${item.id}")
+                    },
+                    onDeleteClicked = {
+                        viewModel.deleteNote(item)
+                    },
+                    minHeight = 160,
+                    maxHeight = 160,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ListView(viewModel: NotesListViewModel, notesList: List<Note>, navController: NavController) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = 12.dp,
+            bottom = 84.dp,
+            start = 16.dp,
+            end = 16.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        val list = notesList.toMutableList()
+        when (viewModel.sortIdx.value) {
+            0 -> list.sortBy { note -> note.title }
+            1 -> list.sortBy { note -> note.color }
+        }
+        items(list) { item ->
+            NoteItem(
+                item,
+                onClick = {
+                    navController.navigate(Screens.AddEditNoteScreen + "?${Constants.NOTE_ID_KEY}=${item.id}")
+                },
+                onDeleteClicked = {
+                    viewModel.deleteNote(item)
+                }
+            )
         }
     }
 }
@@ -129,6 +177,16 @@ fun MyAppBar(viewModel: NotesListViewModel) {
         },
         elevation = 16.dp,
         actions = {
+            IconButton(onClick = {
+                viewModel.listNotesAsGrid.value = !viewModel.listNotesAsGrid.value
+            }) {
+                Icon(
+                    imageVector = if (viewModel.listNotesAsGrid.value) Icons.Rounded.ViewList else Icons.Rounded.GridView,
+                    modifier = Modifier.size(22.dp),
+                    contentDescription = "",
+                    tint = MaterialTheme.colors.onBackground
+                )
+            }
             IconButton(onClick = { viewModel.dropDownMenuState.value = true }) {
                 Icon(
                     imageVector = Icons.Rounded.MoreVert,

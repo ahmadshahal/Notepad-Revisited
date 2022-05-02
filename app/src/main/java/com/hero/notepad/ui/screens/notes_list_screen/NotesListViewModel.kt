@@ -39,6 +39,8 @@ class NotesListViewModel @Inject constructor(
 
     val dropDownMenuState = mutableStateOf(false)
 
+    val listNotesAsGrid = mutableStateOf(false)
+
     init {
         getNotes()
     }

@@ -17,13 +17,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.hero.notepad.common.Constants
 import com.hero.notepad.data.local.app_database.entities.Note
-import com.hero.notepad.ui.theme.BabyBlue
 
 @Composable
-fun NoteItem(note: Note, onDeleteClicked: () -> Unit, onClick: () -> Unit) {
+fun NoteItem(
+    note: Note,
+    onDeleteClicked: () -> Unit,
+    onClick: () -> Unit,
+    minHeight: Int = 100,
+    maxHeight: Int = 256
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = minHeight.dp, max = maxHeight.dp)
             .clip(RoundedCornerShape(9.dp))
             .background(Constants.colors[note.color])
             .clickable { onClick() }
@@ -32,7 +38,7 @@ fun NoteItem(note: Note, onDeleteClicked: () -> Unit, onClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .padding(end = 12.dp),
+                .padding(end = 12.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
