@@ -42,6 +42,7 @@ class AddEditNoteViewModel @Inject constructor(
     val popUpDialogState = mutableStateOf(false)
 
     var noteColorIdx = mutableStateOf(0)
+    var initialNoteColorIdx = 0
 
     private var initialTitleFieldState: String = ""
     private var initialDescriptionFieldState = ""
@@ -64,6 +65,7 @@ class AddEditNoteViewModel @Inject constructor(
 
                     initialTitleFieldState = uiState.data.title
                     initialDescriptionFieldState = uiState.data.description
+                    initialNoteColorIdx = uiState.data.color
                 }
                 _loadNoteState.value = uiState
             }
@@ -96,5 +98,6 @@ class AddEditNoteViewModel @Inject constructor(
     fun hasChanges(): Boolean {
         return (descriptionFieldState.value != initialDescriptionFieldState)
                 || (titleFieldState.value != initialTitleFieldState)
+                || (initialNoteColorIdx != noteColorIdx.value)
     }
 }
