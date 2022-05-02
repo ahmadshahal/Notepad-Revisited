@@ -292,9 +292,7 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
 }
 
 fun backPressed(navController: NavController, addEditNoteViewModel: AddEditNoteViewModel) {
-    if (addEditNoteViewModel.titleFieldState.value.isNotEmpty()
-        || addEditNoteViewModel.descriptionFieldState.value.isNotEmpty()
-    ) {
+    if (addEditNoteViewModel.hasChanges()) {
         addEditNoteViewModel.popUpDialogState.value = true
     } else {
         navController.popBackStack()

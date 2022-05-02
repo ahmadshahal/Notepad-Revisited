@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.hero.notepad.common.Constants
 import com.hero.notepad.data.local.app_database.entities.Note
@@ -52,6 +53,7 @@ fun NoteItem(
                 text = note.description,
                 color = MaterialTheme.colors.onSurface,
                 style = MaterialTheme.typography.body2,
+                overflow = TextOverflow.Ellipsis
             )
         }
         IconButton(

@@ -43,6 +43,9 @@ class AddEditNoteViewModel @Inject constructor(
 
     var noteColorIdx = mutableStateOf(0)
 
+    private var initialTitleFieldState: String = ""
+    private var initialDescriptionFieldState = ""
+
     init {
         // Can't be null because it's an optional parameter with a default value.
         val noteId: Int = savedStateHandle.get<Int>(Constants.NOTE_ID_KEY)!!
@@ -58,6 +61,9 @@ class AddEditNoteViewModel @Inject constructor(
                     titleFieldState.value = uiState.data!!.title
                     descriptionFieldState.value = uiState.data.description
                     noteColorIdx.value = uiState.data.color
+
+                    initialTitleFieldState = uiState.data.title
+                    initialDescriptionFieldState = uiState.data.description
                 }
                 _loadNoteState.value = uiState
             }
@@ -85,6 +91,10 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
         }
+    }
 
+    fun hasChanges(): Boolean {
+        return (descriptionFieldState.value != initialDescriptionFieldState)
+                || (titleFieldState.value != initialTitleFieldState)
     }
 }
