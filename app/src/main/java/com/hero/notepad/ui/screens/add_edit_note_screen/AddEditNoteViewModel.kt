@@ -39,6 +39,7 @@ class AddEditNoteViewModel @Inject constructor(
     val descriptionFieldState = mutableStateOf("")
 
     val dropDownMenuState = mutableStateOf(false)
+    val popUpDialogState = mutableStateOf(false)
 
     var noteColorIdx = mutableStateOf(0)
 

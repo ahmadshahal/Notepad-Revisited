@@ -1,5 +1,6 @@
 package com.hero.notepad.ui.screens.add_edit_note_screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +33,7 @@ fun AddEditNoteScreen(
 ) {
     LaunchedEffect(key1 = true) {
         addEditNoteViewModel.uiEvent.collect { uiEvent ->
-            when(uiEvent) {
+            when (uiEvent) {
                 is UiEvent.PopBackStack -> {
                     navController.popBackStack()
                     notesListViewModel.getNotes()
@@ -71,14 +72,20 @@ fun AddEditNoteScreen(
                 }
             }
             else -> {
-                Body(addEditNoteViewModel = addEditNoteViewModel)
+                Body(addEditNoteViewModel = addEditNoteViewModel, navController = navController)
             }
         }
     }
 }
 
 @Composable
-fun Body(addEditNoteViewModel: AddEditNoteViewModel) {
+fun Body(addEditNoteViewModel: AddEditNoteViewModel, navController: NavController) {
+    if (addEditNoteViewModel.popUpDialogState.value) {
+        PopBackAlertDialog(
+            addEditNoteViewModel = addEditNoteViewModel,
+            navController = navController
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -115,12 +122,19 @@ fun Body(addEditNoteViewModel: AddEditNoteViewModel) {
 
 @Composable
 fun AppBar(navController: NavController, addEditNoteViewModel: AddEditNoteViewModel) {
+    BackHandler {
+        backPressed(navController, addEditNoteViewModel)
+    }
     TopAppBar(
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = MaterialTheme.colors.onBackground,
         elevation = 16.dp,
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(
+                onClick = {
+                    backPressed(navController, addEditNoteViewModel)
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBack,
                     contentDescription = "",
@@ -214,21 +228,21 @@ fun ColorsDropDownMenuItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(Constants.colors[colorIdx])
-                ) {
-                    if (addEditNoteViewModel.noteColorIdx.value == colorIdx) {
-                        Box(
-                            modifier = Modifier
-                                .size(11.dp)
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(MaterialTheme.colors.primary)
-                                .align(Alignment.Center)
-                        )
-                    }
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Constants.colors[colorIdx])
+            ) {
+                if (addEditNoteViewModel.noteColorIdx.value == colorIdx) {
+                    Box(
+                        modifier = Modifier
+                            .size(11.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(MaterialTheme.colors.primary)
+                            .align(Alignment.Center)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
@@ -237,5 +251,55 @@ fun ColorsDropDownMenuItem(
                 color = MaterialTheme.colors.onBackground
             )
         }
+    }
+}
+
+@Composable
+fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController: NavController) {
+    AlertDialog(
+        onDismissRequest = { addEditNoteViewModel.popUpDialogState.value = false },
+        title = {
+            Text(
+                text = "Dismiss Changes?",
+                color = MaterialTheme.colors.onBackground,
+            )
+        },
+        text = {
+            Text(
+                text = "Unsaved changes will be lost",
+                color = MaterialTheme.colors.onBackground,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                navController.popBackStack()
+            }) {
+                Text(
+                    text = "Dismiss",
+                    color = MaterialTheme.colors.onBackground,
+                    style = MaterialTheme.typography.body2
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { addEditNoteViewModel.popUpDialogState.value = false }) {
+                Text(
+                    text = "Cancel",
+                    color = MaterialTheme.colors.onBackground,
+                    style = MaterialTheme.typography.body2
+                )
+            }
+        },
+        shape = RoundedCornerShape(9.dp),
+    )
+}
+
+fun backPressed(navController: NavController, addEditNoteViewModel: AddEditNoteViewModel) {
+    if (addEditNoteViewModel.titleFieldState.value.isNotEmpty()
+        || addEditNoteViewModel.descriptionFieldState.value.isNotEmpty()
+    ) {
+        addEditNoteViewModel.popUpDialogState.value = true
+    } else {
+        navController.popBackStack()
     }
 }
