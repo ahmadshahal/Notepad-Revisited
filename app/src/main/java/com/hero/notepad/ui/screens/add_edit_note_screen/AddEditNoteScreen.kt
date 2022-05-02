@@ -262,12 +262,7 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
             Text(
                 text = "Dismiss Changes?",
                 color = MaterialTheme.colors.onBackground,
-            )
-        },
-        text = {
-            Text(
-                text = "Unsaved changes will be lost",
-                color = MaterialTheme.colors.onBackground,
+                fontWeight = FontWeight.SemiBold
             )
         },
         confirmButton = {
@@ -277,7 +272,8 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
                 Text(
                     text = "Dismiss",
                     color = MaterialTheme.colors.onBackground,
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.body2,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         },
@@ -286,7 +282,8 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
                 Text(
                     text = "Cancel",
                     color = MaterialTheme.colors.onBackground,
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.body2,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         },
