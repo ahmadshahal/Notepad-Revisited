@@ -3,7 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/DIGI TECH/AndroidStudioProjects/Notepad/app/src/main/res/drawable/ic_app_icon.xml" value="0.119" />
+        <entry key="..\:/Users/DIGI TECH/AndroidStudioProjects/Notepad/app/src/main/res/drawable/ic_app_icon_2.xml" value="0.119" />
+        <entry key="..\:/Users/DIGI TECH/AndroidStudioProjects/Notepad/app/src/main/res/drawable/ic_app_splash.xml" value="0.119" />
         <entry key="..\:/Users/DIGI TECH/AndroidStudioProjects/Notepad/app/src/main/res/drawable/ic_baseline_note_24.xml" value="0.119" />
+        <entry key="..\:/Users/DIGI TECH/AndroidStudioProjects/Notepad/app/src/main/res/drawable/ic_splash_icon.xml" value="0.119" />
       </map>
     </option>
   </component>
