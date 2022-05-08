@@ -31,6 +31,8 @@ fun AddEditNoteScreen(
     addEditNoteViewModel: AddEditNoteViewModel = hiltViewModel(),
     notesListViewModel: NotesListViewModel
 ) {
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+
     LaunchedEffect(key1 = true) {
         addEditNoteViewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
@@ -38,11 +40,25 @@ fun AddEditNoteScreen(
                     navController.popBackStack()
                     notesListViewModel.getNotes()
                 }
-                else -> Unit
+                is UiEvent.ShowSnackBar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = uiEvent.message,
+                    )
+                }
             }
         }
     }
     Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = { state ->
+            SnackbarHost(state) { data ->
+                Snackbar(
+                    actionColor = MaterialTheme.colors.onBackground,
+                    contentColor = MaterialTheme.colors.onBackground,
+                    snackbarData = data
+                )
+            }
+        },
         backgroundColor = MaterialTheme.colors.background,
         topBar = {
             AppBar(navController = navController, addEditNoteViewModel = addEditNoteViewModel)
@@ -260,7 +276,7 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
         onDismissRequest = { addEditNoteViewModel.popUpDialogState.value = false },
         title = {
             Text(
-                text = "Dismiss Changes?",
+                text = "Discard Changes?",
                 color = MaterialTheme.colors.onBackground,
                 fontWeight = FontWeight.SemiBold
             )
@@ -270,7 +286,7 @@ fun PopBackAlertDialog(addEditNoteViewModel: AddEditNoteViewModel, navController
                 navController.popBackStack()
             }) {
                 Text(
-                    text = "Dismiss",
+                    text = "Discard",
                     color = MaterialTheme.colors.onBackground,
                     style = MaterialTheme.typography.body2,
                     fontWeight = FontWeight.SemiBold

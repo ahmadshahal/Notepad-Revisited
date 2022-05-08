@@ -93,6 +93,11 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
         }
+        else if(titleFieldState.value.isEmpty()) {
+            viewModelScope.launch {
+                _uiEvent.send(UiEvent.ShowSnackBar(message = "Title can't be empty", action = ""))
+            }
+        }
     }
 
     fun hasChanges(): Boolean {
