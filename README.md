@@ -1,8 +1,11 @@
 ## Intro
-Notepad is a simple notes app created using native android framework.
+This is a Notes Android Application that allows users to create, organize, and store their notes in one place. The application is designed to be simple and user-friendly.
 
-## Technologies
-Notepad is built using Native Android framework with Jetpack Compose, MVVM Clean Architecture, Dagger-Hilt, Kotlin Coroutines, and Room database.
+## Technologies Used
+* Jetpack Compose
+* Kotlin Coroutines
+* Dagger Hilt
+* Room Database
 
 ## Preview
 ![image1](https://user-images.githubusercontent.com/57716361/187023255-6a984d7d-4687-4505-ab81-ab069a3611df.png)
